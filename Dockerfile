@@ -1,17 +1,23 @@
 # set base image (host OS)
-FROM python:3.9
+FROM python:3.9-slim-bullseye
 
+ENV HOSTNAME userge
 # set the working directory in the container
 WORKDIR /app/
 
-RUN apt -qq update
-RUN apt -qq install -y --no-install-recommends \
+RUN apt-get -qq update
+RUN apt-get -qq install -y --no-install-recommends \
     curl \
     git \
     gnupg2 \
     unzip \
     wget \
-    ffmpeg
+    ffmpeg \
+    apt-utils \
+    neofetch \
+    && apt-get clean \
+    && apt-get autoremove \
+    && rm -rf /var/lib/apt/lists/*
 
 # install chrome
 RUN mkdir -p /tmp/ && \
@@ -34,9 +40,8 @@ ENV GOOGLE_CHROME_DRIVER /usr/bin/chromedriver
 ENV GOOGLE_CHROME_BIN /usr/bin/google-chrome-stable
 
 # install node-js
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
-    apt-get install -y nodejs && \
-    npm i -g npm
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get install -y nodejs
 
 # install rar
 RUN mkdir -p /tmp/ && \
